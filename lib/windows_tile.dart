@@ -2,6 +2,9 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'windows_tile.freezed.dart';
 
 class WindowsTile extends StatefulWidget {
   const WindowsTile({
@@ -127,4 +130,18 @@ class _Painter extends CustomPainter {
 
 extension _OffsetExt on Offset {
   bool get isNegative => dx < 0 || dy < 0;
+}
+
+@freezed
+class _Action with _$_Action {
+  const factory _Action.none() = _None;
+
+  const factory _Action.hovered({
+    required Offset position,
+  }) = _Hovered;
+
+  const factory _Action.tapped({
+    required Offset position,
+    required double progress,
+  }) = _Tapped;
 }
