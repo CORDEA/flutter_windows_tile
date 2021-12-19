@@ -15,11 +15,31 @@ class WindowsTile extends StatefulWidget {
   State<WindowsTile> createState() => _WindowsTileState();
 }
 
-class _WindowsTileState extends State<WindowsTile> {
+class _WindowsTileState extends State<WindowsTile>
+    with SingleTickerProviderStateMixin {
   static const _nan = Offset(-1, -1);
 
   var _cursorPosition = _nan;
   var _tapPosition = _nan;
+
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    )..addListener(() {
+        setState(() {});
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,21 +54,25 @@ class _WindowsTileState extends State<WindowsTile> {
           setState(() {
             _tapPosition = details.localPosition;
           });
+          _controller.forward();
         },
         onLongPressCancel: () {
           setState(() {
             _tapPosition = _nan;
           });
+          _controller.reverse();
         },
         onLongPressEnd: (details) {
           setState(() {
             _tapPosition = _nan;
           });
+          _controller.reverse();
         },
         child: CustomPaint(
           foregroundPainter: _Painter(
             cursorPosition: _cursorPosition,
             tapPosition: _tapPosition,
+            animationValue: _controller.value,
           ),
           child: widget.child,
         ),
@@ -58,10 +82,16 @@ class _WindowsTileState extends State<WindowsTile> {
 }
 
 class _Painter extends CustomPainter {
-  _Painter({required this.cursorPosition, required this.tapPosition});
+  _Painter({
+    required this.cursorPosition,
+    required this.tapPosition,
+    required this.animationValue,
+  });
 
   final Offset cursorPosition;
   final Offset tapPosition;
+  final double animationValue;
+
   final _paint = Paint();
 
   @override
@@ -73,7 +103,7 @@ class _Painter extends CustomPainter {
     if (!tapPosition.isNegative) {
       _paint.shader = ui.Gradient.radial(
         cursorPosition,
-        size.width / 5,
+        size.width / (4 + (1 - animationValue) * 2),
         [Colors.white30, Colors.white10],
       );
       canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), _paint);
