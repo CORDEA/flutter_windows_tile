@@ -31,13 +31,19 @@ class _WindowsTileState extends State<WindowsTile> {
       },
       child: GestureDetector(
         onLongPressDown: (details) {
-          _tapPosition = details.localPosition;
+          setState(() {
+            _tapPosition = details.localPosition;
+          });
         },
         onLongPressCancel: () {
-          _tapPosition = _nan;
+          setState(() {
+            _tapPosition = _nan;
+          });
         },
         onLongPressEnd: (details) {
-          _tapPosition = _nan;
+          setState(() {
+            _tapPosition = _nan;
+          });
         },
         child: CustomPaint(
           foregroundPainter: _Painter(
@@ -60,10 +66,23 @@ class _Painter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (size.isEmpty || cursorPosition.isNegative) {
+    if (size.isEmpty) {
       return;
     }
 
+    if (!tapPosition.isNegative) {
+      _paint.shader = ui.Gradient.radial(
+        cursorPosition,
+        size.width / 5,
+        [Colors.white30, Colors.white10],
+      );
+      canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), _paint);
+      return;
+    }
+
+    if (cursorPosition.isNegative) {
+      return;
+    }
     _paint.shader = ui.Gradient.radial(
       cursorPosition,
       size.width / 2.5,
