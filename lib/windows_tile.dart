@@ -16,7 +16,10 @@ class WindowsTile extends StatefulWidget {
 }
 
 class _WindowsTileState extends State<WindowsTile> {
-  var _cursorPosition = const Offset(-1, -1);
+  static const _nan = Offset(-1, -1);
+
+  var _cursorPosition = _nan;
+  var _tapPosition = _nan;
 
   @override
   Widget build(BuildContext context) {
@@ -26,18 +29,33 @@ class _WindowsTileState extends State<WindowsTile> {
           _cursorPosition = event.localPosition;
         });
       },
-      child: CustomPaint(
-        foregroundPainter: _Painter(cursorPosition: _cursorPosition),
-        child: widget.child,
+      child: GestureDetector(
+        onLongPressDown: (details) {
+          _tapPosition = details.localPosition;
+        },
+        onLongPressCancel: () {
+          _tapPosition = _nan;
+        },
+        onLongPressEnd: (details) {
+          _tapPosition = _nan;
+        },
+        child: CustomPaint(
+          foregroundPainter: _Painter(
+            cursorPosition: _cursorPosition,
+            tapPosition: _tapPosition,
+          ),
+          child: widget.child,
+        ),
       ),
     );
   }
 }
 
 class _Painter extends CustomPainter {
-  _Painter({required this.cursorPosition});
+  _Painter({required this.cursorPosition, required this.tapPosition});
 
   final Offset cursorPosition;
+  final Offset tapPosition;
   final _paint = Paint();
 
   @override
