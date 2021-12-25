@@ -52,6 +52,11 @@ class _WindowsTileState extends State<WindowsTile>
           _cursorPosition = event.localPosition;
         });
       },
+      onExit: (_) {
+        setState(() {
+          _cursorPosition = _nan;
+        });
+      },
       child: GestureDetector(
         onLongPressDown: (details) {
           setState(() {
